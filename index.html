@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404: NOT_FOUND</title>
+    <style>
+        /* Pengaturan dasar halaman agar konten berada di tengah */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Pembungkus utama untuk membatasi lebar konten */
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Kotak detail error (atas) */
+        .error-card {
+            border: 1px solid #eaeaea;
+            border-radius: 5px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .error-card h1 {
+            font-size: 16px;
+            font-weight: 400;
+            margin: 0 0 24px 0;
+        }
+
+        .error-card h1 strong {
+            font-weight: 600;
+        }
+
+        .error-details p {
+            font-size: 14px;
+            color: #444444;
+            margin: 0 0 12px 0;
+        }
+
+        .error-details p:last-child {
+            margin: 0;
+        }
+
+        /* Style untuk teks kode (monospace) */
+        code {
+            font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+            background-color: #f9f9f9;
+            color: #111111;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* Kotak informasi tambahan (bawah) */
+        .info-box {
+            border: 1px solid #0070f3;
+            border-radius: 5px;
+            padding: 16px;
+            font-size: 14px;
+            color: #0070f3;
+        }
+
+        .info-box a {
+            color: #0070f3;
+            text-decoration: none;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="error-card">
+            <h1><strong>404</strong>: NOT_FOUND</h1>
+            <div class="error-details">
+                <p>Code: <code>DEPLOYMENT_NOT_FOUND</code></p>
+                <p>ID: <code>sin1::gqprz-1771775872329-6af30b47c7bc</code></p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            This deployment cannot be found. For more information and troubleshooting, see our <a href="#">documentation</a>.
+        </div>
+    </div>
+
+</body>
+</html>
