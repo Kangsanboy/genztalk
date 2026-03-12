@@ -1,0 +1,216 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+==========================================================================
+【AI HANDOVER NOTE】
+1. DESIGN PHILOSOPHY:
+   - Cyber-Futurism meets Y2K Nostalgia: Menggabungkan estetika futuristik dengan nostalgia digital era 2000-an yang kini kembali populer di kalangan Gen Z
+   - Dopamine Design: Menggunakan warna neon saturated tinggi untuk menciptakan respons emosional positif dan energik
+   - Glassmorphism 2.0 with Neon Rim-light: Setiap surface menggunakan backdrop-blur dengan border neon glow yang menciptakan depth dan hierarchy visual
+   - True Black Foundation: Background menggunakan pure black (oklch(0.1 0 0)) untuk kontras maksimal dengan neon accents dan menghemat battery OLED
+   - Edgy & Bold: Desain berani dengan high contrast, tidak takut menggunakan warna saturated, mencerminkan keberanian Gen Z dalam menyuarakan pendapat
+
+2. TYPOGRAPHY:
+   - Space Grotesk: Font geometric modern dengan personality yang kuat, sangat cocok untuk headline dan UI yang bold. Memiliki karakter futuristik namun tetap readable, mencerminkan vibe tech-savvy Gen Z
+   - JetBrains Mono: Digunakan untuk elemen code-like, timestamps, atau metadata yang memberikan sentuhan cyber/hacker aesthetic yang relate dengan digital native Gen Z
+   - Weight hierarchy: 700 untuk hero headlines, 600 untuk section titles, 500 untuk body emphasis, 400 untuk regular text
+
+3. COLOR SYSTEM:
+   - Brand Trinity (Neon Triad): Electric Purple (H:290), Cyan Blue (H:195), Lime Green (H:130) - tiga warna neon signature yang menciptakan identitas visual yang memorable dan energetic
+   - --brand maps to Electric Purple sebagai primary identity color
+   - --primary (Purple): Digunakan untuk CTA utama, interactive elements, dan brand touchpoints
+   - --accent (Cyan): Untuk secondary actions, hover states, dan visual accents yang menciptakan depth
+   - --ring (Lime): Focus indicator yang sangat visible, menciptakan accessibility yang baik dengan personality yang kuat
+   - Semantic colors menggunakan neon variants: destructive (Neon Red H:10), success (Neon Green H:145), warning (Neon Orange H:45)
+   - Chart colors: Full neon spectrum untuk data visualization yang eye-catching
+   - Sidebar: Slightly lighter black dengan purple tint untuk subtle differentiation
+
+4. USAGE GUIDE:
+   - Layout: Full-width landing page dengan Bento Grid system untuk content showcase. Hero section menggunakan centered layout dengan large typography
+   - Glassmorphism Implementation: Gunakan backdrop-blur-xl pada semua card/popover elements. Combine dengan border yang menggunakan gradient neon (primary + accent) untuk rim-light effect
+   - Neon Glow Effects: Implementasikan shadow-[0_0_20px_rgba(color,0.5)] pada interactive elements. Intensitas glow meningkat pada hover state
+   - Animation Strategy: Scroll-triggered animations menggunakan Intersection Observer. Stagger delay 100-150ms antar elemen untuk smooth reveal. Fade-in + slide-up (translateY: 20px → 0) dengan duration 600-800ms dan ease-out timing
+   - Mobile-First: Semua spacing dan typography menggunakan clamp() untuk fluid scaling. Touch targets minimum 44px. Reduce glow intensity pada mobile untuk performance
+   - Contrast Considerations: Meskipun menggunakan true black, pastikan text foreground menggunakan slight desaturation (C: 0.02-0.04) untuk mengurangi eye strain pada prolonged reading
+   - Interactive States: Hover meningkatkan brightness (+10% L) dan glow intensity. Active state mengurangi brightness (-5% L). Focus menggunakan lime ring dengan 3px offset
+   - Accessibility: Meskipun neon-heavy, pastikan text contrast ratio minimum 7:1 (AAA) untuk body text. Gunakan aria-labels untuk decorative neon elements
+==========================================================================
+*/
+
+:root {
+  /* Typography */
+  --font-sans: Space Grotesk, system-ui, -apple-system, sans-serif;
+  --font-mono: JetBrains Mono, Consolas, monospace;
+  
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* Core UI Tokens */
+  --background: oklch(0.98 0.005 290);
+  --foreground: oklch(0.15 0.02 290);
+  --card: oklch(0.96 0.01 290);
+  --card-foreground: oklch(0.15 0.02 290);
+  --popover: oklch(0.98 0.005 290);
+  --popover-foreground: oklch(0.15 0.02 290);
+  --primary: oklch(0.55 0.28 290);
+  --primary-foreground: oklch(0.98 0.01 290);
+  --secondary: oklch(0.92 0.015 290);
+  --secondary-foreground: oklch(0.2 0.02 290);
+  --muted: oklch(0.94 0.01 290);
+  --muted-foreground: oklch(0.45 0.015 290);
+  --accent: oklch(0.6 0.25 195);
+  --accent-foreground: oklch(0.98 0.01 195);
+  --destructive: oklch(0.55 0.27 10);
+  --destructive-foreground: oklch(0.98 0.01 10);
+  --border: oklch(0.88 0.02 290);
+  --input: oklch(0.88 0.02 290);
+  --ring: oklch(0.65 0.26 130);
+  
+  /* Chart Tokens */
+  --chart-1: oklch(0.55 0.28 290);
+  --chart-2: oklch(0.6 0.25 195);
+  --chart-3: oklch(0.65 0.26 130);
+  --chart-4: oklch(0.6 0.24 330);
+  --chart-5: oklch(0.58 0.26 45);
+  
+  /* Sidebar Tokens */
+  --sidebar: oklch(0.96 0.01 290);
+  --sidebar-foreground: oklch(0.2 0.02 290);
+  --sidebar-primary: oklch(0.55 0.28 290);
+  --sidebar-primary-foreground: oklch(0.98 0.01 290);
+  --sidebar-accent: oklch(0.6 0.25 195);
+  --sidebar-accent-foreground: oklch(0.98 0.01 195);
+  --sidebar-border: oklch(0.88 0.02 290);
+  --sidebar-ring: oklch(0.65 0.26 130);
+}
+
+.dark {
+  --background: oklch(0.1 0 0);
+  --foreground: oklch(0.92 0.04 290);
+  --card: oklch(0.14 0.02 290);
+  --card-foreground: oklch(0.92 0.04 290);
+  --popover: oklch(0.12 0.01 290);
+  --popover-foreground: oklch(0.92 0.04 290);
+  --primary: oklch(0.65 0.32 290);
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.18 0.03 290);
+  --secondary-foreground: oklch(0.92 0.04 290);
+  --muted: oklch(0.16 0.02 290);
+  --muted-foreground: oklch(0.6 0.04 290);
+  --accent: oklch(0.7 0.28 195);
+  --accent-foreground: oklch(0.1 0 0);
+  --destructive: oklch(0.6 0.3 10);
+  --destructive-foreground: oklch(0.95 0.02 10);
+  --border: oklch(0.22 0.04 290);
+  --input: oklch(0.22 0.04 290);
+  --ring: oklch(0.75 0.3 130);
+  
+  /* Chart Tokens */
+  --chart-1: oklch(0.65 0.32 290);
+  --chart-2: oklch(0.7 0.28 195);
+  --chart-3: oklch(0.75 0.3 130);
+  --chart-4: oklch(0.68 0.29 330);
+  --chart-5: oklch(0.65 0.3 45);
+  
+  /* Sidebar Tokens */
+  --sidebar: oklch(0.12 0.015 290);
+  --sidebar-foreground: oklch(0.88 0.04 290);
+  --sidebar-primary: oklch(0.65 0.32 290);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.7 0.28 195);
+  --sidebar-accent-foreground: oklch(0.1 0 0);
+  --sidebar-border: oklch(0.2 0.04 290);
+  --sidebar-ring: oklch(0.75 0.3 130);
+}
+
+@theme inline {
+  /* Shadcn Core Mapping */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Charts Mapping */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar Mapping */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* Radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans min-h-screen;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  code, pre {
+    @apply font-mono;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-primary;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40;
+  }
+}
