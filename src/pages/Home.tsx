@@ -92,7 +92,7 @@ export default function Home() {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute top-6 right-6 z-50 flex items-center gap-4 bg-background/60 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/30 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+          className="fixed top-6 right-6 z-50 flex items-center gap-4 bg-background/60 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/30 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
         >
           {/* Nama dengan Outline/Glow Text */}
           <span className="font-bold text-sm md:text-base bg-gradient-to-r from-accent via-primary to-ring bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] hidden sm:block">
