@@ -85,7 +85,7 @@ export function Layout({ children }: LayoutProps) {
               {/* Tempat Gambar Logo (Placeholder) */}
               <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/40 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(168,85,247,0.3)] group-hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] transition-all">
                 {/* NANTI TINGGAL GANTI BARIS DI BAWAH INI SAMA TAG <img src="link-logo-abang.png" /> */}
-                <span className="text-xs font-black text-primary">GZ</span>
+                <img src="/genztalk.png" alt="Logo Genztalk" className="w-full h-full object-cover" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-ring bg-clip-text text-transparent">
                 Genztalk.id
