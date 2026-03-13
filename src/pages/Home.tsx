@@ -5,7 +5,7 @@ import { IMAGES } from "@/assets/images";
 import { Opinion, formatDate, truncateText, getStaggerDelay } from "@/lib/index";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Heart, MessageCircle, TrendingUp, Users, Zap } from "lucide-react";
+import { Heart, MessageCircle, TrendingUp, Users, Zap, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 const membershipBenefits = [
@@ -29,20 +29,29 @@ const membershipBenefits = [
 export default function Home() {
   const [opinions, setOpinions] = useState<Opinion[]>([]);
   const [loading, setLoading] = useState(true);
-// Fungsi buat narik data dari database Supabase
+  const [user, setUser] = useState<any>(null); // State buat nyimpen data user yang login
+
   useEffect(() => {
+    // 1. Cek apakah ada user yang lagi login saat web dibuka
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // 2. Pantau kalau-kalau usernya login atau logout
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    // 3. Tarik data opini dari database
     async function fetchOpinions() {
       const { data, error } = await supabase
         .from('opinions')
         .select('*')
-        .order('createdat', { ascending: false }); // <-- INI YANG DIGANTI (huruf kecil semua)
+        .order('createdat', { ascending: false });
 
-      if (error) {
-        console.error("Waduh, gagal narik data:", error);
-      }
+      if (error) console.error("Waduh, gagal narik data:", error);
 
       if (data) {
-        // Kita sesuaikan datanya biar cocok sama desain web kamu
         const formattedData = data.map((item: any) => ({
           id: item.id,
           title: item.title,
@@ -56,94 +65,94 @@ export default function Home() {
           category: item.category,
           likes: item.likes,
           comments: item.comments,
-          createdAt: new Date(item.createdat), // <-- INI JUGA DIGANTI (huruf kecil)
+          createdAt: new Date(item.createdat),
         }));
-        
         setOpinions(formattedData);
       }
       setLoading(false);
     }
+    
     fetchOpinions();
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Fungsi buat Login with Google
   const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
+    await supabase.auth.signInWithOAuth({ provider: 'google' });
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
     <Layout>
-      <section
-        id="hero"
-        className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      >
+      {/* PROFIL USER DI POJOK KANAN ATAS (CUMA MUNCUL KALAU LOGIN) */}
+      {user && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute top-6 right-6 z-50 flex items-center gap-4 bg-background/60 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/30 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+        >
+          {/* Nama dengan Outline/Glow Text */}
+          <span className="font-bold text-sm md:text-base bg-gradient-to-r from-accent via-primary to-ring bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] hidden sm:block">
+            {user.user_metadata?.full_name}
+          </span>
+          
+          {/* Foto Profil dengan Outline Gradasi */}
+          <div 
+            onClick={handleLogout}
+            className="group relative cursor-pointer rounded-full p-[2px] bg-gradient-to-tr from-accent via-primary to-ring shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.8)] transition-all duration-300"
+            title="Klik untuk Logout"
+          >
+            <img 
+              src={user.user_metadata?.avatar_url} 
+              alt="Profile" 
+              className="w-10 h-10 rounded-full object-cover border-2 border-background group-hover:opacity-50 transition-opacity"
+            />
+            {/* Ikon Logout pas di-hover */}
+            <LogOut className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+          </div>
+        </motion.div>
+      )}
+
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src={IMAGES.NEON_BG_1}
-            alt="Neon Background"
-            className="w-full h-full object-cover opacity-30"
-          />
+          <img src={IMAGES.NEON_BG_1} alt="Neon Background" className="w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background/70" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
             <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-primary via-accent to-ring bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
               Suaramu, Panggungmu
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Platform tempat Gen Z Indonesia menyuarakan opini, berbagi ide, dan
-              membangun diskusi yang bermakna
+              Platform tempat Gen Z Indonesia menyuarakan opini, berbagi ide, dan membangun diskusi yang bermakna
             </p>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            >
-              <Button
-                onClick={handleLogin}
-                size="lg"
-                className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.8)] transition-all duration-300"
-              >
-                Mulai Bersuara
-              </Button>
+            
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 30 }}>
+              {/* TOMBOL BERUBAH KALAU UDAH LOGIN */}
+              {user ? (
+                <Button size="lg" className="text-lg px-8 py-6 bg-accent hover:bg-accent/90 shadow-[0_0_30px_rgba(34,211,238,0.6)] hover:shadow-[0_0_40px_rgba(34,211,238,0.8)] transition-all duration-300 text-black font-bold">
+                  Tulis Opini Sekarang
+                </Button>
+              ) : (
+                <Button onClick={handleLogin} size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.8)] transition-all duration-300">
+                  Mulai Bersuara
+                </Button>
+              )}
             </motion.div>
-          </motion.div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="w-6 h-10 border-2 border-primary rounded-full flex items-start justify-center p-2">
-              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-            </div>
           </motion.div>
         </div>
       </section>
 
       <section id="opinions" className="py-24 relative">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-accent via-primary to-ring bg-clip-text text-transparent">
               Opini Terbaru
             </h2>
-            <p className="text-xl text-muted-foreground">
-              Lihat apa yang lagi hot di komunitas
-            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -153,57 +162,27 @@ export default function Home() {
               <p className="text-center col-span-full text-muted-foreground">Belum ada opini. Jadilah yang pertama bersuara!</p>
             ) : (
               opinions.map((opinion, index) => (
-                <motion.div
-                  key={opinion.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{
-                    duration: 0.6,
-                    delay: getStaggerDelay(index, 0.1),
-                    ease: "easeOut",
-                  }}
-                >
-                  <Card className="h-full backdrop-blur-xl bg-card/40 border-2 border-primary/20 shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:border-primary/40 transition-all duration-300 overflow-hidden group">
+                <motion.div key={opinion.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.6, delay: getStaggerDelay(index, 0.1), ease: "easeOut" }}>
+                  <Card className="h-full backdrop-blur-xl bg-card/40 border-2 border-primary/20 shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:border-primary/40 transition-all duration-300 group">
                     <div className="p-6 flex flex-col h-full">
                       <div className="flex items-center gap-3 mb-4">
-                        <img
-                          src={opinion.author.avatar}
-                          alt={opinion.author.username}
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/50"
-                        />
+                        <img src={opinion.author.avatar} alt={opinion.author.username} className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/50" />
                         <div className="flex-1">
-                          <p className="font-semibold text-foreground">
-                            {opinion.author.username}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(opinion.createdAt)}
-                          </p>
+                          <p className="font-semibold text-foreground">{opinion.author.username}</p>
+                          <p className="text-sm text-muted-foreground">{formatDate(opinion.createdAt)}</p>
                         </div>
-                        <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
-                          {opinion.category}
-                        </span>
+                        <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">{opinion.category}</span>
                       </div>
-
-                      <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
-                        {opinion.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4 flex-1 line-clamp-3">
-                        {truncateText(opinion.content, 150)}
-                      </p>
-
+                      <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">{opinion.title}</h3>
+                      <p className="text-muted-foreground mb-4 flex-1 line-clamp-3">{truncateText(opinion.content, 150)}</p>
                       <div className="flex items-center gap-4 pt-4 border-t border-border/50">
                         <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group/btn">
                           <Heart className="w-5 h-5 group-hover/btn:fill-primary group-hover/btn:text-primary transition-all" />
-                          <span className="text-sm font-medium">
-                            {opinion.likes}
-                          </span>
+                          <span className="text-sm font-medium">{opinion.likes}</span>
                         </button>
                         <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group/btn">
                           <MessageCircle className="w-5 h-5 group-hover/btn:text-accent transition-colors" />
-                          <span className="text-sm font-medium">
-                            {opinion.comments}
-                          </span>
+                          <span className="text-sm font-medium">{opinion.comments}</span>
                         </button>
                       </div>
                     </div>
@@ -212,115 +191,41 @@ export default function Home() {
               ))
             )}
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-center mt-12"
-          >
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-2 border-primary/50 hover:bg-primary/10 hover:border-primary shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-all duration-300"
-            >
-              Lihat Semua Opini
-            </Button>
-          </motion.div>
         </div>
       </section>
 
-      <section id="membership" className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-ring via-accent to-primary bg-clip-text text-transparent">
-              Join the Riot
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Jadi bagian dari komunitas Gen Z yang paling berpengaruh di
-              Indonesia
-            </p>
-          </motion.div>
-
-          <div className="max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className="backdrop-blur-xl bg-card/40 border-2 border-accent/30 shadow-[0_0_40px_rgba(34,211,238,0.2)] overflow-hidden">
-                <div className="p-8 md:p-12">
-                  <div className="grid md:grid-cols-3 gap-8 mb-12">
-                    {membershipBenefits.map((benefit, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{
-                          duration: 0.5,
-                          delay: getStaggerDelay(index, 0.15),
-                        }}
-                        className="text-center"
-                      >
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-accent/20 to-primary/20 border-2 border-accent/50 mb-4 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-                          <benefit.icon className="w-8 h-8 text-accent" />
-                        </div>
-                        <h3 className="text-xl font-bold mb-2 text-foreground">
-                          {benefit.title}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {benefit.description}
-                        </p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                    className="text-center"
-                  >
-                    <div className="mb-6">
-                      <p className="text-4xl font-bold text-foreground mb-2">
-                        Gratis
-                      </p>
-                      <p className="text-muted-foreground">
-                        Untuk early adopters
-                      </p>
-                    </div>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    >
-                      <Button
-                        onClick={handleLogin}
-                        size="lg"
-                        className="text-lg px-12 py-6 bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:shadow-[0_0_40px_rgba(34,211,238,0.7)] transition-all duration-300"
-                      >
-                        Daftar Sekarang
-                      </Button>
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </Card>
+      {/* SECTION MEMBERSHIP DIHILANGKAN KALAU UDAH LOGIN */}
+      {!user && (
+        <section id="membership" className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+          <div className="container mx-auto px-4 relative z-10">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-ring via-accent to-primary bg-clip-text text-transparent">
+                Join the Riot
+              </h2>
             </motion.div>
+
+            <div className="max-w-5xl mx-auto">
+              <Card className="backdrop-blur-xl bg-card/40 border-2 border-accent/30 shadow-[0_0_40px_rgba(34,211,238,0.2)] p-8 md:p-12 text-center">
+                <div className="grid md:grid-cols-3 gap-8 mb-12">
+                  {membershipBenefits.map((benefit, index) => (
+                    <div key={index} className="text-center">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-accent/20 to-primary/20 border-2 border-accent/50 mb-4 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                        <benefit.icon className="w-8 h-8 text-accent" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2 text-foreground">{benefit.title}</h3>
+                      <p className="text-muted-foreground">{benefit.description}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button onClick={handleLogin} size="lg" className="text-lg px-12 py-6 bg-gradient-to-r from-accent to-primary shadow-[0_0_30px_rgba(34,211,238,0.5)]">
+                  Daftar Sekarang
+                </Button>
+              </Card>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </Layout>
   );
 }
