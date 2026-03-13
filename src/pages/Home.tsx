@@ -1,103 +1,12 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { IMAGES } from "@/assets/images";
 import { Opinion, formatDate, truncateText, getStaggerDelay } from "@/lib/index";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heart, MessageCircle, TrendingUp, Users, Zap } from "lucide-react";
-
-const mockOpinions: Opinion[] = [
-  {
-    id: "1",
-    title: "Kenapa Gen Z Lebih Suka Remote Work?",
-    content: "Gue rasa work-life balance itu penting banget. Kerja dari rumah bikin kita bisa atur waktu sendiri, lebih produktif, dan gak buang waktu di jalan. Plus, mental health juga lebih terjaga karena bisa istirahat kapan aja.",
-    author: {
-      id: "u1",
-      username: "@digitalrebel",
-      avatar: IMAGES.COMMUNITY_1,
-      joinedAt: new Date("2025-01-15"),
-    },
-    createdAt: new Date("2026-03-10"),
-    likes: 234,
-    comments: 45,
-    category: "Karir",
-  },
-  {
-    id: "2",
-    title: "Mental Health Awareness di Kalangan Gen Z",
-    content: "Kita harus lebih terbuka soal mental health. Gak ada yang salah dengan minta bantuan atau curhat. Stigma negatif harus dihilangkan. Self-care bukan cuma skincare, tapi juga jaga pikiran dan perasaan.",
-    author: {
-      id: "u2",
-      username: "@mindfulkid",
-      avatar: IMAGES.COMMUNITY_2,
-      joinedAt: new Date("2025-06-20"),
-    },
-    createdAt: new Date("2026-03-11"),
-    likes: 567,
-    comments: 89,
-    category: "Kesehatan",
-  },
-  {
-    id: "3",
-    title: "Sustainable Living: Gaya Hidup Ramah Lingkungan",
-    content: "Mulai dari hal kecil: bawa tumbler sendiri, kurangi plastik sekali pakai, pilih produk lokal. Bumi cuma satu, dan kita yang bakal ngerasain dampaknya kalau gak dijaga dari sekarang.",
-    author: {
-      id: "u3",
-      username: "@ecochampion",
-      avatar: IMAGES.COMMUNITY_3,
-      joinedAt: new Date("2025-03-10"),
-    },
-    createdAt: new Date("2026-03-09"),
-    likes: 412,
-    comments: 67,
-    category: "Lingkungan",
-  },
-  {
-    id: "4",
-    title: "Side Hustle Culture: Jadi Entrepreneur Muda",
-    content: "Gak perlu tunggu lulus kuliah buat mulai bisnis. Manfaatin skill yang lo punya, mulai dari jual produk digital, jasa desain, atau konten kreator. Kunci utamanya: konsisten dan terus belajar.",
-    author: {
-      id: "u4",
-      username: "@hustlerz",
-      avatar: IMAGES.GLASS_EFFECT_1,
-      joinedAt: new Date("2025-08-05"),
-    },
-    createdAt: new Date("2026-03-08"),
-    likes: 789,
-    comments: 123,
-    category: "Bisnis",
-  },
-  {
-    id: "5",
-    title: "Pentingnya Financial Literacy untuk Gen Z",
-    content: "Belajar kelola uang dari sekarang. Bikin budget, nabung, investasi. Jangan cuma ikut-ikutan tren tanpa mikir masa depan. Financial freedom itu dimulai dari kebiasaan kecil yang konsisten.",
-    author: {
-      id: "u5",
-      username: "@moneysmart",
-      avatar: IMAGES.GLASS_EFFECT_3,
-      joinedAt: new Date("2025-11-12"),
-    },
-    createdAt: new Date("2026-03-07"),
-    likes: 645,
-    comments: 98,
-    category: "Keuangan",
-  },
-  {
-    id: "6",
-    title: "Social Media: Blessing or Curse?",
-    content: "Medsos bisa jadi alat yang powerful buat networking dan belajar, tapi juga bisa toxic kalau gak bijak makenya. Jangan bandingkan hidup lo sama highlight reel orang lain. Real life > Instagram life.",
-    author: {
-      id: "u6",
-      username: "@realtalk",
-      avatar: IMAGES.COMMUNITY_1,
-      joinedAt: new Date("2025-04-18"),
-    },
-    createdAt: new Date("2026-03-06"),
-    likes: 523,
-    comments: 156,
-    category: "Teknologi",
-  },
-];
+import { supabase } from "@/lib/supabaseClient";
 
 const membershipBenefits = [
   {
@@ -118,6 +27,53 @@ const membershipBenefits = [
 ];
 
 export default function Home() {
+  const [opinions, setOpinions] = useState<Opinion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fungsi buat narik data dari database Supabase
+  useEffect(() => {
+    async function fetchOpinions() {
+      const { data, error } = await supabase
+        .from('opinions')
+        .select('*')
+        .order('createdAt', { ascending: false });
+
+      if (error) {
+        console.error("Waduh, gagal narik data:", error);
+      }
+
+      if (data) {
+        // Kita sesuaikan datanya biar cocok sama desain web kamu
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          content: item.content,
+          author: {
+            id: item.id,
+            username: item.author_username,
+            avatar: item.author_avatar || IMAGES.COMMUNITY_1,
+            joinedAt: new Date(), 
+          },
+          category: item.category,
+          likes: item.likes,
+          comments: item.comments,
+          createdAt: new Date(item.createdAt),
+        }));
+        
+        setOpinions(formattedData);
+      }
+      setLoading(false);
+    }
+    fetchOpinions();
+  }, []);
+
+  // Fungsi buat Login with Google
+  const handleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+  };
+
   return (
     <Layout>
       <section
@@ -152,6 +108,7 @@ export default function Home() {
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             >
               <Button
+                onClick={handleLogin}
                 size="lg"
                 className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:shadow-[0_0_40px_rgba(168,85,247,0.8)] transition-all duration-300"
               >
@@ -191,64 +148,70 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockOpinions.map((opinion, index) => (
-              <motion.div
-                key={opinion.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{
-                  duration: 0.6,
-                  delay: getStaggerDelay(index, 0.1),
-                  ease: "easeOut",
-                }}
-              >
-                <Card className="h-full backdrop-blur-xl bg-card/40 border-2 border-primary/20 shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:border-primary/40 transition-all duration-300 overflow-hidden group">
-                  <div className="p-6 flex flex-col h-full">
-                    <div className="flex items-center gap-3 mb-4">
-                      <img
-                        src={opinion.author.avatar}
-                        alt={opinion.author.username}
-                        className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/50"
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-foreground">
-                          {opinion.author.username}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(opinion.createdAt)}
-                        </p>
+            {loading ? (
+              <p className="text-center col-span-full text-primary animate-pulse">Memuat opini keren dari database...</p>
+            ) : opinions.length === 0 ? (
+              <p className="text-center col-span-full text-muted-foreground">Belum ada opini. Jadilah yang pertama bersuara!</p>
+            ) : (
+              opinions.map((opinion, index) => (
+                <motion.div
+                  key={opinion.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: getStaggerDelay(index, 0.1),
+                    ease: "easeOut",
+                  }}
+                >
+                  <Card className="h-full backdrop-blur-xl bg-card/40 border-2 border-primary/20 shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:border-primary/40 transition-all duration-300 overflow-hidden group">
+                    <div className="p-6 flex flex-col h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <img
+                          src={opinion.author.avatar}
+                          alt={opinion.author.username}
+                          className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/50"
+                        />
+                        <div className="flex-1">
+                          <p className="font-semibold text-foreground">
+                            {opinion.author.username}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatDate(opinion.createdAt)}
+                          </p>
+                        </div>
+                        <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
+                          {opinion.category}
+                        </span>
                       </div>
-                      <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
-                        {opinion.category}
-                      </span>
-                    </div>
 
-                    <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
-                      {opinion.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 flex-1 line-clamp-3">
-                      {truncateText(opinion.content, 150)}
-                    </p>
+                      <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
+                        {opinion.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 flex-1 line-clamp-3">
+                        {truncateText(opinion.content, 150)}
+                      </p>
 
-                    <div className="flex items-center gap-4 pt-4 border-t border-border/50">
-                      <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group/btn">
-                        <Heart className="w-5 h-5 group-hover/btn:fill-primary group-hover/btn:text-primary transition-all" />
-                        <span className="text-sm font-medium">
-                          {opinion.likes}
-                        </span>
-                      </button>
-                      <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group/btn">
-                        <MessageCircle className="w-5 h-5 group-hover/btn:text-accent transition-colors" />
-                        <span className="text-sm font-medium">
-                          {opinion.comments}
-                        </span>
-                      </button>
+                      <div className="flex items-center gap-4 pt-4 border-t border-border/50">
+                        <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group/btn">
+                          <Heart className="w-5 h-5 group-hover/btn:fill-primary group-hover/btn:text-primary transition-all" />
+                          <span className="text-sm font-medium">
+                            {opinion.likes}
+                          </span>
+                        </button>
+                        <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group/btn">
+                          <MessageCircle className="w-5 h-5 group-hover/btn:text-accent transition-colors" />
+                          <span className="text-sm font-medium">
+                            {opinion.comments}
+                          </span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+                  </Card>
+                </motion.div>
+              ))
+            )}
           </div>
 
           <motion.div
@@ -345,6 +308,7 @@ export default function Home() {
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     >
                       <Button
+                        onClick={handleLogin}
                         size="lg"
                         className="text-lg px-12 py-6 bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:shadow-[0_0_40px_rgba(34,211,238,0.7)] transition-all duration-300"
                       >
