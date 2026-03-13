@@ -29,14 +29,13 @@ const membershipBenefits = [
 export default function Home() {
   const [opinions, setOpinions] = useState<Opinion[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Fungsi buat narik data dari database Supabase
+// Fungsi buat narik data dari database Supabase
   useEffect(() => {
     async function fetchOpinions() {
       const { data, error } = await supabase
         .from('opinions')
         .select('*')
-        .order('createdAt', { ascending: false });
+        .order('createdat', { ascending: false }); // <-- INI YANG DIGANTI (huruf kecil semua)
 
       if (error) {
         console.error("Waduh, gagal narik data:", error);
@@ -57,7 +56,7 @@ export default function Home() {
           category: item.category,
           likes: item.likes,
           comments: item.comments,
-          createdAt: new Date(item.createdAt),
+          createdAt: new Date(item.createdat), // <-- INI JUGA DIGANTI (huruf kecil)
         }));
         
         setOpinions(formattedData);
