@@ -87,34 +87,6 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* PROFIL USER DI POJOK KANAN ATAS (CUMA MUNCUL KALAU LOGIN) */}
-      {user && (
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed top-6 right-6 z-50 flex items-center gap-4 bg-background/60 backdrop-blur-xl px-4 py-2 rounded-full border border-primary/30 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
-        >
-          {/* Nama dengan Outline/Glow Text */}
-          <span className="font-bold text-sm md:text-base bg-gradient-to-r from-accent via-primary to-ring bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(168,85,247,0.8)] hidden sm:block">
-            {user.user_metadata?.full_name}
-          </span>
-          
-          {/* Foto Profil dengan Outline Gradasi */}
-          <div 
-            onClick={handleLogout}
-            className="group relative cursor-pointer rounded-full p-[2px] bg-gradient-to-tr from-accent via-primary to-ring shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.8)] transition-all duration-300"
-            title="Klik untuk Logout"
-          >
-            <img 
-              src={user.user_metadata?.avatar_url} 
-              alt="Profile" 
-              className="w-10 h-10 rounded-full object-cover border-2 border-background group-hover:opacity-50 transition-opacity"
-            />
-            {/* Ikon Logout pas di-hover */}
-            <LogOut className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-          </div>
-        </motion.div>
-      )}
 
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
