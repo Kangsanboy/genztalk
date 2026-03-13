@@ -15,10 +15,10 @@ const membershipBenefits = [
 ];
 
 const logoPhilosophy = [
-  { image: "/filosofi-1.png", title: "Lingkaran Gradasi", desc: "Melambangkan komunitas yang inklusif dan dinamis. Warna-warninya menggambarkan keberagaman ide, latar belakang, dan perspektif generasi muda.", quote: "Perbedaan perspektif bukan penghalang melainkan awal dari percakapan bermakna." },
-  { image: "/filosofi-2.png", title: 'Huruf "G"', desc: "Melambangkan Gen Z sebagai pusat gerakan ini. Bentuknya yang tegas dan dinamis menggambarkan generasi yang kreatif, kritis, dan berani.", quote: "Perubahan yang baik sering dimulai dari generasi yang berani berpikir dan berbicara." },
-  { image: "/filosofi-3.png", title: "Balon Percakapan", desc: "Ujung huruf G membentuk balon percakapan. Ini melambangkan dialog, diskusi, dan ruang berbagi gagasan di mana kita saling memahami.", quote: "Percakapan yang baik tidak hanya didengar tetapi juga dipahami." },
-  { image: "/filosofi-4.png", title: "Mikrofon", desc: "Melambangkan suara generasi muda. Simbol dari keberanian untuk berbicara, berbagi cerita, dan menyampaikan perspektif.", quote: "Komunikasi mengubah suara menjadi pemahaman." }
+  { image: "genztalk.png", title: "Lingkaran Gradasi", desc: "Melambangkan komunitas yang inklusif dan dinamis. Warna-warninya menggambarkan keberagaman ide, latar belakang, dan perspektif generasi muda.", quote: "Perbedaan perspektif bukan penghalang melainkan awal dari percakapan bermakna." },
+  { image: "genztalk-2.png", title: 'Huruf "G"', desc: "Melambangkan Gen Z sebagai pusat gerakan ini. Bentuknya yang tegas dan dinamis menggambarkan generasi yang kreatif, kritis, dan berani.", quote: "Perubahan yang baik sering dimulai dari generasi yang berani berpikir dan berbicara." },
+  { image: "genztalk.png", title: "Balon Percakapan", desc: "Ujung huruf G membentuk balon percakapan. Ini melambangkan dialog, diskusi, dan ruang berbagi gagasan di mana kita saling memahami.", quote: "Percakapan yang baik tidak hanya didengar tetapi juga dipahami." },
+  { image: "genztalk.png", title: "Mikrofon", desc: "Melambangkan suara generasi muda. Simbol dari keberanian untuk berbicara, berbagi cerita, dan menyampaikan perspektif.", quote: "Komunikasi mengubah suara menjadi pemahaman." }
 ];
 
 export default function Home() {
